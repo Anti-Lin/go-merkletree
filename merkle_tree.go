@@ -662,3 +662,24 @@ func (m *MerkleTree) Proof(dataBlock DataBlock) (*Proof, error) {
 		Siblings: siblings,
 	}, nil
 }
+
+func (m *MerkleTree) Restore(config *Config) {
+	m.Config = config
+
+	// Hash function initialization.
+	if m.HashFunc == nil {
+		if m.RunInParallel {
+			m.HashFunc = defaultHashFuncParallel // Parallelized hash function must be concurrent safe.
+		} else {
+			m.HashFunc = defaultHashFunc
+		}
+	}
+	// Hash concatenation function initialization.
+	if m.concatFunc == nil {
+		if m.SortSiblingPairs {
+			m.concatFunc = concatSortHash
+		} else {
+			m.concatFunc = concatHash
+		}
+	}
+}
